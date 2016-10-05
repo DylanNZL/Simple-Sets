@@ -90,13 +90,21 @@ Set<EType>::Set( ) {
   mSize = 0;
 }
 
-/* Copy Constructor */
+/* Copy Constructor
+ * Copy one set of nodes into another.
+ */
 template <typename EType>
 Set<EType>::Set( const Set<EType> & rhs ) {
-
+  Node *ptr = rhs.mFirst;
+  while (ptr != nullptr) {
+    insert(ptr->mData);
+    ptr = ptr->mNext;
+  }
 }
 
-/* Move Constructor */
+/* Move Constructor
+ * Move one set of Nodes into a new node.
+ */
 template <typename EType>
 Set<EType>::Set( Set<EType> && rhs ) {
   setToEmptySet();
@@ -106,7 +114,9 @@ Set<EType>::Set( Set<EType> && rhs ) {
   rhs.mSize = 0;
 }
 
-/* Destructor */
+/* Destructor
+ * Delete the pointers and set data to null.
+ */
 template <typename EType>
 Set<EType>::~Set( ) {
   Node *ptr = mFirst;
@@ -121,25 +131,51 @@ Set<EType>::~Set( ) {
 /* Copy Assignement Operator */
 template <typename EType>
 Set<EType> & Set<EType>::operator=( const Set<EType> & rhs) {
-
+  Node *ptr = rhs.mFirst;
+  while (ptr != nullptr) {
+    insert(ptr->mData);
+    ptr = ptr->mNext;
+  }
 }
 
 /* Move Assignement Operator */
 template <typename EType>
 Set<EType> & Set<EType>::operator=( Set<EType> && rhs) {
-
+ setToEmptySet();
+ mFirst = rhs.mFirst;
+ rhs.mFirst = nullptr;
+ mSize = rhs.mSize;
+ rhs.mSize = 0;
 }
 
-/* Union */
+/* Union
+ * To make this work need to remove const from the function
+ */
 template <typename EType>
 Set<EType> Set<EType>::operator+( const Set<EType> & rhs ) const{
- std::cout << rhs.mFirst << " " << mFirst << endl;
+ //std::cout << rhs.mFirst << " " << mFirst << endl;
+ Node *two = rhs.mFirst;
+ while (two != nullptr) {
+   if (!isElement(two->mData)) {
+    // insert(two->mData);
+   }
+   two = two->mNext;
+ }
 }
 
-/* intersection */
+/* Intersection
+ * To make this work remove const keyword
+ */
 template <typename EType>
 Set<EType> Set<EType>::operator*( const Set<EType> & rhs ) const{
-
+  Node *one = mFirst;
+  while (one != nullptr) {
+    Node *next = one->mNext;
+    if (!rhs.isElement(one->mData)) {
+      //remove(one->mData);
+    }
+    one = next;
+  }
 }
 
 /* Print Function
@@ -170,6 +206,7 @@ bool Set<EType>::isElement( const EType & x ) const {
   }
   return false;
 }
+
 /* Is Empty method
  * Checks if a set is empty or not
  */
@@ -180,6 +217,7 @@ bool Set<EType>::isEmpty( ) const {
   }
   return false;
 }
+
 /* Get Size method
  * Returns the mSize data member of Set.
  */
@@ -187,6 +225,7 @@ template <typename EType>
 int Set<EType>::getSize( ) const {
   return mSize;
 }
+
 /* Set to empty Function
  * Takes a Set and sets it to an empty set
  */
@@ -203,7 +242,9 @@ void Set<EType>::setToEmptySet() {
   mSize = 0;
 }
 
-/* Insert Function */
+/* Insert Function
+ *
+ */
 template <typename EType>
 void Set<EType>::insert( const EType & x ) {
   if (isElement(x)) {
@@ -231,7 +272,6 @@ void Set<EType>::remove( const EType & x ) {
   } else if (ptr->mData == x) {
     // delete ptr
     mFirst = ptr->mNext;
-    //ptr->mData = NULL;
     ptr = nullptr;
     deleted = true;
     mSize--;
@@ -242,7 +282,6 @@ void Set<EType>::remove( const EType & x ) {
         // delete nextPtr
         Node *next = nextPtr->mNext;
         ptr->mNext = next;
-        //nextPtr->mData = NULL;
         nextPtr->mNext = nullptr;
         deleted = true;
         mSize--;
@@ -259,7 +298,9 @@ void Set<EType>::remove( const EType & x ) {
   }
 }
 
-/* Output operator that redirects to the print function in the Set class */
+/* Output operator
+ * redirects to the print function in the Set class
+ */
 template <typename EType>
 ostream & operator<< (ostream &out, const Set<EType> &set) {
   set.print(out);

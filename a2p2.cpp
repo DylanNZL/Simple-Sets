@@ -26,7 +26,7 @@ int main( ){
       cout << "S1: " << s1 << ", size= " << s1.getSize( ) << endl;
       cout << "S2: " << s2 << ", size= " << s2.getSize( ) << endl;
 
-      /*Set<int> s3 = s1+ s2; //union
+      Set<int> s3 = s1+ s2; //union
       Set<int> s4 = s1* s2; //intersection
       cout << "s1 + s2: " << s3 << endl;
       cout << "s1 * s2: " << s4 << endl;
@@ -37,7 +37,7 @@ int main( ){
       cout << "S4: " << s4 << ", size= " << s4.getSize( ) << endl;
       cout << "S5: " << s5 << ", size= " << s5.getSize( ) << endl;
       cout<<"S4again:"<<s4<< endl;
-      testCopyCtr(s4);*/
+      testCopyCtr(s4);
     }
     catch(RemoveFromEmpty ex) {
       cout<<endl<<ex.what()<<endl;
