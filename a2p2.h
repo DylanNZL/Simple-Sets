@@ -24,8 +24,8 @@ public:
     RemoveFromEmpty() {
       mMessage = "Empty set exception thrown";
     }
-    ~RemoveFromEmpty() _NOEXCEPT {}
-    const char* what() const _NOEXCEPT {
+    //~RemoveFromEmpty() _NOEXCEPT {}
+    const char* what() const noexcept {
        return "Empty set exception thrown";
     }
 
@@ -39,8 +39,8 @@ public:
     NonExistingElem() {
       mMessage = "Element doesn't exist excpetion thrown";
     }
-    ~NonExistingElem() _NOEXCEPT {}
-    const char* what() const _NOEXCEPT {
+    //~NonExistingElem() _NOEXCEPT {}
+    const char* what() const noexcept {
       return "Element doesn't exist excpetion thrown";
     }
 private:
@@ -95,11 +95,13 @@ Set<EType>::Set( ) {
  */
 template <typename EType>
 Set<EType>::Set( const Set<EType> & rhs ) {
-  Node *ptr = rhs.mFirst;
-  while (ptr != nullptr) {
-    insert(ptr->mData);
-    ptr = ptr->mNext;
-  }
+	mFirst = nullptr;
+	mSize = 0;
+	Node *ptr = rhs.mFirst;
+	while (ptr != nullptr) {
+		this->insert(ptr->mData);
+		ptr = ptr->mNext;
+	}
 }
 
 /* Move Constructor
@@ -107,7 +109,6 @@ Set<EType>::Set( const Set<EType> & rhs ) {
  */
 template <typename EType>
 Set<EType>::Set( Set<EType> && rhs ) {
-  setToEmptySet();
   mFirst = rhs.mFirst;
   rhs.mFirst = nullptr;
   mSize = rhs.mSize;
@@ -121,7 +122,7 @@ template <typename EType>
 Set<EType>::~Set( ) {
   Node *ptr = mFirst;
   while (ptr != nullptr) {
-    ptr->mData = NULL;
+    ptr->mData = 0;
     Node *next = ptr->mNext;
     ptr->mNext = nullptr;
     ptr = next;
@@ -131,51 +132,65 @@ Set<EType>::~Set( ) {
 /* Copy Assignement Operator */
 template <typename EType>
 Set<EType> & Set<EType>::operator=( const Set<EType> & rhs) {
-  Node *ptr = rhs.mFirst;
-  while (ptr != nullptr) {
-    insert(ptr->mData);
-    ptr = ptr->mNext;
-  }
+	if (this != &rhs) {
+		this->setToEmptySet();
+		Node *ptr = rhs.mFirst;
+		while (ptr != nullptr) {
+			this->insert(ptr->mData);
+			ptr = ptr->mNext;
+		}
+	}
+	return *this;
 }
 
 /* Move Assignement Operator */
 template <typename EType>
 Set<EType> & Set<EType>::operator=( Set<EType> && rhs) {
- setToEmptySet();
- mFirst = rhs.mFirst;
- rhs.mFirst = nullptr;
- mSize = rhs.mSize;
- rhs.mSize = 0;
+	if (this != &rhs) {
+		setToEmptySet();
+		mFirst = rhs.mFirst;
+		rhs.mFirst = nullptr;
+		mSize = rhs.mSize;
+		rhs.mSize = 0;
+	}
 }
 
 /* Union
- * To make this work need to remove const from the function
+ *
  */
 template <typename EType>
 Set<EType> Set<EType>::operator+( const Set<EType> & rhs ) const{
  //std::cout << rhs.mFirst << " " << mFirst << endl;
- Node *two = rhs.mFirst;
- while (two != nullptr) {
-   if (!isElement(two->mData)) {
-    // insert(two->mData);
-   }
-   two = two->mNext;
+ Node *s1 = mFirst;
+ Node *s2 = rhs.mFirst;
+ Set<EType> result;
+
+ while (s1 != nullptr) {
+   result.insert(s1->mData);
+   s1 = s1->mNext;
  }
+ while (s2 != nullptr) {
+   result.insert(s2->mData);
+   s2 = s2->mNext;
+ }
+ return result;
 }
 
 /* Intersection
- * To make this work remove const keyword
+ *
  */
 template <typename EType>
 Set<EType> Set<EType>::operator*( const Set<EType> & rhs ) const{
-  Node *one = mFirst;
-  while (one != nullptr) {
-    Node *next = one->mNext;
-    if (!rhs.isElement(one->mData)) {
-      //remove(one->mData);
-    }
-    one = next;
-  }
+	Node *one = mFirst;
+	Set<EType> result;
+	
+	while (one != nullptr) {
+		if (rhs.isElement(one->mData)) {
+			result.insert(one->mData);
+		}
+		one = one->mNext;
+	}
+	return result;
 }
 
 /* Print Function
@@ -183,13 +198,17 @@ Set<EType> Set<EType>::operator*( const Set<EType> & rhs ) const{
  */
 template <typename EType>
 void Set<EType>::print( ostream & out ) const {
-  cout << "{ ";
-  Node *ptr = mFirst;
-  while (ptr != nullptr) {
-    cout << ptr->mData << ' ';
-    ptr = ptr->mNext;
-  }
-  cout << '}';
+	cout << "{ ";
+	Node *ptr = mFirst;
+	if (ptr != nullptr) {
+		cout << ptr->mData;
+		ptr = ptr->mNext;
+	}
+	while (ptr != nullptr) {
+		cout  << ", "<< ptr->mData;
+		ptr = ptr->mNext;
+	}
+	cout << " }";
 }
 
 /* Is element method
@@ -235,7 +254,7 @@ void Set<EType>::setToEmptySet() {
   mFirst = nullptr;
   while (ptr != nullptr) {
     Node *next = ptr->mNext;
-    ptr->mData = NULL;
+    ptr->mData = 0;
     ptr->mNext = nullptr;
     ptr = next;
   }
